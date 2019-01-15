@@ -20,6 +20,9 @@ import CounterButton from './10_optimizingPerformance';
 import { WordAdder } from './10_optimizingPerformance';
 import PortalApp from './11_portals';
 import { Parent } from './11_portals';
+// import  TickTock  from "./12_reactWithoutES6";
+import AutoFocusTextInput from './15_refsAndDOM';
+import { CustomTextInput2 } from './15_refsAndDOM';
 
 
 const OtherComponent = React.lazy(() => import('./02_splitCode'));
@@ -68,6 +71,8 @@ class App extends Component {
         <WordAdder />
         <PortalApp />
         <Parent />
+        <AutoFocusTextInput />
+        <CustomTextInput2 />
       </div>
     );
   }
