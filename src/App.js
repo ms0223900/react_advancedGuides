@@ -23,6 +23,7 @@ import { Parent } from './11_portals';
 // import  TickTock  from "./12_reactWithoutES6";
 import AutoFocusTextInput from './15_refsAndDOM';
 import { CustomTextInput2 } from './15_refsAndDOM';
+import MouseTracker from './16_renderProps';
 
 
 const OtherComponent = React.lazy(() => import('./02_splitCode'));
@@ -73,6 +74,7 @@ class App extends Component {
         <Parent />
         <AutoFocusTextInput />
         <CustomTextInput2 />
+        <MouseTracker />
       </div>
     );
   }
