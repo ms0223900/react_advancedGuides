@@ -24,7 +24,12 @@ import { Parent } from './11_portals';
 import AutoFocusTextInput from './15_refsAndDOM';
 import { CustomTextInput2 } from './15_refsAndDOM';
 import MouseTracker from './16_renderProps';
-
+import MyCom1 from './18_strictMode';
+import { MyCom2, MyCom3 } from './18_strictMode';
+import Greeting from './19_typecheckingWithProptypes';
+import { MyComponent1, MyComponent2 } from './19_typecheckingWithProptypes';
+import NameForm, { FileInput } from './20_uncontrolledComponents';
+import { ControlledForm } from './20_uncontrolledComponents'
 
 const OtherComponent = React.lazy(() => import('./02_splitCode'));
 const AnotherComponent = React.lazy(() => import('./02_splitCode_another'));
@@ -75,6 +80,22 @@ class App extends Component {
         <AutoFocusTextInput />
         <CustomTextInput2 />
         <MouseTracker />
+        <React.StrictMode>
+          <MyCom1 />
+          <MyCom2 />
+          <MyCom3 />
+        </React.StrictMode>
+        <hr />
+        <Greeting />
+        <MyComponent1>
+          <p>This is a neccesary child.</p>
+          <p>It cannot be two children, or it will be warned at console.</p>
+        </MyComponent1>
+        <MyComponent2 />
+        <hr />
+        <NameForm />
+        <ControlledForm />
+        <FileInput />
       </div>
     );
   }
