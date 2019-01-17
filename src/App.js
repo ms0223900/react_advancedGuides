@@ -67,7 +67,7 @@ class App extends Component {
         <Example model={model} />
         <MyButton color="red" color2="blue " />
         {LS3.map((num) => (
-          <MyComponents1.NumPicker number={num} />
+          <MyComponents1.NumPicker number={num} key={num.toString()} />
         ))}
         <Story story="this is a story" storyType="photo" />
         <Story story="this is a video" storyType="video" />
@@ -76,7 +76,7 @@ class App extends Component {
         <CounterButton color="#345" />
         <WordAdder />
         <PortalApp />
-        <Parent />
+        {/* <Parent /> */}
         <AutoFocusTextInput />
         <CustomTextInput2 />
         <MouseTracker />
@@ -89,7 +89,7 @@ class App extends Component {
         <Greeting />
         <MyComponent1>
           <p>This is a neccesary child.</p>
-          <p>It cannot be two children, or it will be warned at console.</p>
+          {/* <p>It cannot be two children, or it will be warned at console.</p> */}
         </MyComponent1>
         <MyComponent2 />
         <hr />
@@ -100,14 +100,6 @@ class App extends Component {
     );
   }
 }
-
-
-
-
-
-
-
-
 
 
 
