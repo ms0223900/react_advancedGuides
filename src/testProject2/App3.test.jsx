@@ -84,6 +84,7 @@ describe('test App3', () => {
     expect(app3.state('accountingList')).toEqual([{
       id: 1,
       category: 'Food',
+      isEdit: false, 
       price: 2,
     }]);
   });

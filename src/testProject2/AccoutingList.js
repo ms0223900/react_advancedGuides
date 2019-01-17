@@ -7,30 +7,26 @@ import edit from './images/edit.png';
 configure({ adapter: new Adapter() });
 //---------------------------------------------------------------------------------------
 
-class AccountingList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { };
-  }
-  
-  render() {
-    const editInput = (value) => 
+function AccountingList(props) {
+    const editInput = (value, id) => 
       <input 
         defaultValue={value}
-        onChange={this.props.onChangeNumber} />;
+        onChange={(e) => props.onChangeNumber(e, id)}
+        onKeyDown={(e) => props.onKeyDown(e, id)}
+        ref={props.inputRef} />;
     return (
       <React.Fragment>
-        {this.props.accountingList.map(ls => (
+        {props.accountingList.map(ls => (
           <tr key={ls.id}>
             <td>{ls.category}</td>
-            <td>
-              {this.props.isEdit ? 
-                editInput(ls.price) : 
-                ('NTD' + ls.price)
+            <td onDoubleClick={() => props.onHandleEdit(ls.id)}>
+              {ls.isEdit ? 
+                editInput(ls.price, ls.id) : 
+                ('$  ' + ls.price)
                 }
             </td>
             <td 
-              onClick={(e) => this.props.onHandleEdit(ls.id, e)}>
+              onClick={() => props.onHandleEdit(ls.id)}>
               <img 
                 src={edit} 
                 alt="edit" 
@@ -41,7 +37,6 @@ class AccountingList extends React.Component {
       </React.Fragment>
     );
   }
-}
 
 
 

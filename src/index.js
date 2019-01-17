@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import './index.css';
-import App from './App';
-import App2 from './testProject/App2';
 import App3 from './testProject2/App3'
 import './testProject/css/App2.css';
 import './testProject2/css/App3.css';

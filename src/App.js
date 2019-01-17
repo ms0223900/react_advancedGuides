@@ -62,9 +62,9 @@ class App extends Component {
         <AppContext />
         <MyAnotherComponent />
         <Fragment list={LS1} list2={LS2} />
-        <Chosen />
-        <List collection={collection} />
-        <Example model={model} />
+        {/* <Chosen /> */}
+        {/* <List collection={collection} /> */}
+        {/* <Example model={model} /> */}
         <MyButton color="red" color2="blue " />
         {LS3.map((num) => (
           <MyComponents1.NumPicker number={num} key={num.toString()} />

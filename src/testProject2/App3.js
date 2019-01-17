@@ -14,6 +14,7 @@ const $ = (all) => document.querySelectorAll(all);
 class App3 extends React.Component {
   constructor(props) {
     super(props);
+    this.inputRef = null;
     this.state = {
       number: 0,
       category: '',
@@ -22,6 +23,11 @@ class App3 extends React.Component {
     };
   }
 
+  _onFocus = () => {
+    if(this.inputRef) {
+      this.inputRef.focus();
+    }
+  }
   _onHandleEdit = (id) => {
     console.log(id);
     // this.setState({
@@ -33,9 +39,27 @@ class App3 extends React.Component {
     //     }
     //   ], 
     // });
+    this._onFocus();
+    const newAccLs = this.state.accountingList.map(
+      acc => acc.id === id ? {...acc, isEdit: !acc.isEdit} : acc);
+    this.setState({
+      accountingList: newAccLs,
+    });
   }
-  _onChangeNumber = () => {
-
+  _onKeyDown = (e, id) => {
+    if(e.keyCode === 13 || e.keyCode === 27) {
+      this._onHandleEdit(id);
+    }
+  }
+  _onChangeNumber = (e, id) => {
+    console.log(e.target.value);
+    console.log(e.keyCode);
+    const newAccLs = this.state.accountingList.map(
+      acc => acc.id === id ? {...acc, price: (e.target.value) * 1} : acc);
+    this.setState({
+      accountingList: newAccLs,
+    });
+    
   }
   _onHandleNumberInput = (num) => {
     console.log(num);
@@ -93,7 +117,9 @@ class App3 extends React.Component {
               accountingList={this.state.accountingList}
               onHandleEdit={this._onHandleEdit}
               isEdit={this.state.accountingList.isEdit}
-              onChangeNumber={this._onChangeNumber} />
+              onChangeNumber={this._onChangeNumber}
+              onKeyDown={this._onKeyDown}
+              inputRef={el => this.inputRef = el} />
           </tbody>
         </table>
         <InputPad

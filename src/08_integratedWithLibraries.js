@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-import Backbone from 'backbone';
+// import Backbone from 'backbone';
 // import chosen from 'chosen-js';
 
 // class Chosen extends React.Component {
@@ -112,11 +112,11 @@ class List extends React.Component {
   }
 }
 
-const collection = new Backbone.Collection([
-  new Backbone.Model({ text: 'A' }),
-  new Backbone.Model({ text: 'B' }),
-  new Backbone.Model({ text: 'C' })
-]);
+// const collection = new Backbone.Collection([
+//   new Backbone.Model({ text: 'A' }),
+//   new Backbone.Model({ text: 'B' }),
+//   new Backbone.Model({ text: 'C' })
+// ]);
 
 
 
@@ -176,11 +176,11 @@ function Example(props) {
   );
 }
 
-const model = new Backbone.Model({firstName: 'Freddo'});
+// const model = new Backbone.Model({firstName: 'Freddo'});
 
 
 
 export default HelloButton;
-export { List, collection, Example };
+// export { List, collection, Example };
 
 
