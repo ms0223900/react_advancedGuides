@@ -30,15 +30,6 @@ class App3 extends React.Component {
   }
   _onHandleEdit = (id) => {
     console.log(id);
-    // this.setState({
-    //   accountingList: [
-    //     ...this.state.accountingList, 
-    //     {
-    //       id: id,
-    //       isEdit: true, 
-    //     }
-    //   ], 
-    // });
     this._onFocus();
     const newAccLs = this.state.accountingList.map(
       acc => acc.id === id ? {...acc, isEdit: !acc.isEdit} : acc);

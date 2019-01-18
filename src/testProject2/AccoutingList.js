@@ -11,6 +11,7 @@ function AccountingList(props) {
     const editInput = (value, id) => 
       <input 
         defaultValue={value}
+        id={'input' + id}
         onChange={(e) => props.onChangeNumber(e, id)}
         onKeyDown={(e) => props.onKeyDown(e, id)}
         ref={props.inputRef} />;
@@ -19,11 +20,14 @@ function AccountingList(props) {
         {props.accountingList.map(ls => (
           <tr key={ls.id}>
             <td>{ls.category}</td>
-            <td onDoubleClick={() => props.onHandleEdit(ls.id)}>
+            <td 
+              onDoubleClick={() => props.onHandleEdit(ls.id)}
+              id={'price' + ls.id}
+            >
               {ls.isEdit ? 
                 editInput(ls.price, ls.id) : 
                 ('$  ' + ls.price)
-                }
+              }
             </td>
             <td 
               onClick={() => props.onHandleEdit(ls.id)}>

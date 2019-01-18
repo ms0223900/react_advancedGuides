@@ -3,11 +3,11 @@ import { shallow, mount, render } from 'enzyme';
 //My components here
 import App3 from './App3';
 import InputPad from './InputPad';
+import AccountingList from './AccoutingList';
 
 //---------------------------------------------------------------------------------------
 
 describe('test InputPad.js', () => {
-
   it('click a input to call the function', () => {
     let spy = jest.fn();
     const inputPad = shallow(<InputPad onHandleNumberInput={spy}/>);
@@ -52,11 +52,51 @@ describe('test InputPad.js', () => {
     expect(spy).toHaveBeenCalled();
   });
 
+  it('after click confirm and change the state of app3, it will be add a acounting list', () => {
+    const accList = [{
+      id: 1,
+      category: 'Food',
+      isEdit: false, 
+      price: 2,
+    }];
+    const accountingList = shallow(<AccountingList accountingList={accList} />);
+    expect(accountingList.find('#price1').length).toBe(1);
+  });
 
+  it('if the edit is true, the list will change into a input', () => {
+    let spy = jest.fn();
+    const accList = [{
+      id: 1,
+      category: 'Food',
+      isEdit: true, 
+      price: 2,
+    }];
+    const accountingList = shallow(<AccountingList accountingList={accList} />);
+    expect(accountingList.find('#input1')).toHaveLength(1);
+  });
+
+  it('double click call function correctly', () => {
+    let spy = jest.fn();
+    const accList = [{
+      id: 1,
+      category: 'Food',
+      isEdit: false, 
+      price: 2,
+    }];
+    const accountingList = shallow(
+      <AccountingList 
+        accountingList={accList} 
+        onHandleEdit={spy} />);
+
+    accountingList.find('#price1').simulate('doubleclick');
+    expect(spy).toHaveBeenCalled();
+  });
 });
 
+//---------------------------------------------------------------------------------------
+
 describe('test App3', () => {
-  it('test clear function and set the number of state to zero.', () => {
+  it('test "clear" function and set the number of state to zero.', () => {
     const app3 = shallow(<App3 />);
     app3.instance()._onHandleClear();
     expect(app3.state('number')).toBe(0);
@@ -100,6 +140,22 @@ describe('test App3', () => {
 
     expect(app3.find('#total').text()).toBe('3');
   });
+
+  it('edit the list, its state should be editable', () => {
+    const app3 = shallow(<App3 />);
+    app3.instance()._onHandleCatInput('Food');
+    app3.instance()._onHandleNumberInput(2);
+    app3.instance()._onHandleConfirm();
+
+    app3.instance()._onHandleEdit(1);
+    expect(app3.state('accountingList')).toEqual([{
+      id: 1,
+      category: 'Food',
+      isEdit: true, 
+      price: 2,
+    }]);
+  });
+
 })
 
 
