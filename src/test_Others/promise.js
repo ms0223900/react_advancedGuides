@@ -148,15 +148,22 @@ const data = {
     isComplete: false, 
   }]
 };
-function toggleTodo(e) {
-  const todoID = parseInt(e.target.getAttribute('todoID'));
+function updateTodo(e) {
+  
+}
+function toggleTodo(id, e) {
   let todos = data.todos;
+  let newTodos = 
   todos.map(todo => 
-    todo.id === todoID ? 
-    { ...todo, isComplete: !todo.isComplete} : 
+    todo.id === id ? 
+    { ...todo, isComplete: !todo.isComplete } : 
     todo
   );
-
+  data.todos = newTodos;
+  
+  console.log(data.todos);
+  // console.log(e.target.className);
+  addMyRequest('Todos', mountTodos, data.todos);
 }
 function deleteTodo(e) {
   const todoID = parseInt(e.target.getAttribute('todoID'));
@@ -194,10 +201,17 @@ function mountTodos(todosArr) {
   let todos = '';
   for (let i = 0; i < todosArr.length; i++) {
     const todo = todosArr[i];
+    console.log(todo.isComplete);
+    let className;
+    if(todo.isComplete) {
+      className = 'todoItem line';
+    } else {
+      className = 'todoItem';
+    }
     todos +=  
       `<p>
         <span>${todo.id} </span>
-        ${todo.todoThing} 
+        <span class=${className}>${todo.todoThing}<span> 
         <span class='deleteBTN' todoID=${todo.id}> | X | </span>
       </p>`;
   }
@@ -205,6 +219,10 @@ function mountTodos(todosArr) {
   $id('todo-container').innerHTML += todos;
   for (const el of $('.deleteBTN')) {
     el.onclick = deleteTodo;
+  }
+  const todoItem = $('.todoItem');
+  for (let i = 0; i < todoItem.length; i++) {
+    todoItem[i].onclick = toggleTodo.bind(this, i + 1);
   }
   // add event listener to the all todos
 }
