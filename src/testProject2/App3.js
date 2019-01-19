@@ -16,13 +16,19 @@ class App3 extends React.Component {
     super(props);
     this.inputRef = null;
     this.state = {
+      today: this._getToday(),
       number: 0,
       category: '',
       counter: 0, 
       accountingList: [],
     };
   }
-
+  
+  _getToday = () => {
+    const date = new Date();
+    let today = date.toLocaleDateString();
+    return today;
+  }
   _onFocus = () => {
     if(this.inputRef) {
       this.inputRef.focus();
@@ -84,13 +90,13 @@ class App3 extends React.Component {
   componentDidMount = () => {
     // $('input')[0].setAttribute('checked', true); //測試會出錯
   }
-
+ 
   render() {
     return (
       <React.Fragment>
         <h1>App3--Accouting</h1>
         <hr />
-        <h2> 1 / 17</h2>
+        <h2 id="today-title">{this.state.today}</h2>
         <h2>Today you cost: 
           <span id="total">
             {this.state.accountingList

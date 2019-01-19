@@ -1,83 +1,6 @@
 //
-function asyncFunction(val) {
-  return new Promise((res, rej) => {
-    if(val)
-      res(val)
-    else
-      rej('reason');
-  })
-}
-
-
-function a(val) {
-  setTimeout(() => {
-    console.log('fnA: ' + val);
-    
-  }, 0);
-  return val + 1;
-}
-function b(val) {
-  let k = 0;
-  for (let i = 0; i < 100000000; i++) {
-    k++;
-  }
-  // return k + 10; 
-  setTimeout(() => {
-    console.log('fnB: ' + k); 
-  }, 0);
-}
-function c(val) {
-  setTimeout(() => {
-    console.log('fnC: ' + val); 
-    return val + 10; 
-  }, 2000);
-}
-let d = (val) => setTimeout((val=1000) => {
-  console.log('fnD: ' + 1000);
-  return val + 1000;
-}, 3000);
-// a(100);
-// b(100);
-// c(100);
-// d(1000);
-// asyncFunction(1).then(d).then(a).then(b).then(c);
-
-const timer = (i) => {
-  console.log('timer');
-  setTimeout(() => {
-    console.log('time: ' + i);
-    ++i;
-    if(i < 10) {
-      timer(i);
-    }
-  }, 1000);
-};
-
-let delay = (s) => {
-  // let res = res;
-  return new Promise((res, rej) => {
-    setTimeout(res, s);
-    // rej();
-  });
-};
-console.log(delay(1000));
-function ikk(i) {
-  // let kk = i;
-  return function k(t) {
-    return i + t;
-  }
-}
-
-async function test01() {
-  await timer(1);
-  await b(1);
-  await a(2);
-}
-// test01();
-
-
-///---------------------------------------------------------------------------------------------------------
-
+const $id = (id) => document.getElementById(id);
+const $ = (all) => document.querySelectorAll(all);
 const data1 = {
   id: 1, 
   name: 'Peter',
@@ -88,15 +11,18 @@ const data2 = {
   name: 'Sam',
   date: (new Date()).toLocaleDateString(),
 };
+///---------------------------------------------------------------------------------------------------------
+
+
+
+
 var db;
 let request = window.indexedDB.open('myDB1');
+
 function dataBaseInit(tableName) {
   request.addEventListener('success', function() {
     db = request.result;
-    console.log('database open success');
-    addRequest();
-    // readRequest();
-    // doRequest.read();
+    console.log('database: ' + tableName +', open success.');
   });
   request.addEventListener('upgradeneeded', function(e) {
     db = e.target.result;
@@ -112,84 +38,254 @@ function dataBaseInit(tableName) {
   });
   
 }
-// dataBaseInit('Member');
+dataBaseInit('Member');
+dataBaseInit('Todos');  
 
-function add(db, data) {
-  let request = db.transaction(['Member'], 'readwrite')
-    .objectStore('Member')
-    .add(data);
+//---------------------------------------------------------------------------------------
+
+
+function add(db, table,  dataArr) {
+  console.log('adding start!');
+  //取得第0個
+  let DATA = dataArr;
+  if(DATA) {
+    for (let i = 0; i < DATA.length; i++) {
+      console.log(DATA[i]);
+      let request = db.transaction([table], 'readwrite')
+        .objectStore(table)
+        .add(DATA[i]);
+      console.log(request);
+      request.addEventListener('success', (e) => {
+        console.log("write success !");
+      });
+      request.addEventListener('error', (e) => {
+        console.log('already have the data.');
+        // document.writeln('');
+      });
+      if(i === DATA.length - 1) {
+        return [db, table];
+        // break;
+      }
+    }
+  } else {
+    return [db, table];
+  }
   
-  request.addEventListener('success', (e) => {
-    console.log("write success !");
+}
+function getDB_All(db, table) {
+  return new Promise((res, rej) => {
+    let objectStore = db.transaction([table]).objectStore(table).getAll();
+    console.log(objectStore);
+    objectStore.onsuccess = function () {
+      res(objectStore.result);
+    }
   });
-
-  request.addEventListener('error', (e) => {
-    console.log('write failed! ');
-  });
 }
-function addRequest() {
-  // doRequest.add(i);
-}
-
-const doRequest = {
-  add() {
-    return null;
-  },
-  read() {
-    return null;
-  },
-}
-
-request.addEventListener('success', addMyRequest(data1, data2));
-function addMyRequest(...data) {
+// request.addEventListener('success', addMyRequest(1, data2));  
+function addMyRequest(table, mountEl, dataArr = []) {
   let db;
-  let requestRead
+  let dbPromise;
+
   let request = window.indexedDB.open('myDB1');
   request.onsuccess = function(e) {
-    db = e.target.result;
-    requestRead = (id) => db.transaction(['Member']).objectStore('Member').get(id);
-  }
-  setTimeout(() => {
-    setTimeout(() => {
-      console.log(db);
-      for (let i = 0; i < data.length; i++) {
-        const el = data[i];
-        console.log(el.id);
-        if(!requestRead(el.id).result || typeof(el.id) === 'number') {
-          console.log('add it');
-          add(db, el);
-        }
+    console.log('openSuccess!');
+    dbPromise = new Promise((res, rej) => {
+      db = e.target.result; //這裡要用異步處理！！
+      console.log(dataArr); //dataArr pass OK
+      if(dataArr.length > 0) {
+        res([db, table, dataArr]); // write
+      } else { 
+        res([db, table]); // read
       }
-    }, 0);
-  }, 0);
-}
-//真正要添加數據時
-doRequest.add = addMyRequest;
-//手動添加
-// doRequest.add();
-
-
-function readRequest(id) {
-  read(id);
-}
-function read(db, id) {
-  let request = db.transaction(['Member']).objectStore('Member').get(id);
-
-  request.onerror = function(e) {
-    console.log('read failed, need to add');
+    });
+    if(dataArr.length > 0) { // write and mount
+      dbPromise
+      .then(val => add(val[0], val[1], val[2]))
+      .then(val => getDB_All(val[0], val[1]))
+      .then(val => mountEl(val));
+    } else { // read and mount
+      dbPromise
+      .then(val => getDB_All(val[0], val[1]))
+      .then(val => mountEl(val));
+    }
     
   }
-  request.onsuccess = function(e) {
-    console.log(request.result);
-    if(request.result) {
-      let rs = request.result;
-      console.log('Name: ' + rs.name);
-      return false;
-    } else {
-      console.log('add');
-      return true; //read false, need to add new one
+}
+function mountDataTable(el) {
+  let dataElements = '';
+  if(el.length > 1) {
+    for (let i = 0; i < el.length; i++) {
+      dataElements += 
+      `<tr>
+        <td>${ el[i].id }</td>
+        <td>${ el[i].name }</td>
+        <td>${ el[i].date }</td>
+      </tr>`;
     }
+  } else {
+    dataElements = `<tr></tr>`;
   }
+  // console.log(el, dataElements);
+  let dataTable = 
+   `<table>
+      <tbody>
+        <tr>
+          <th>ID: </th>
+          <th>Name: </th>
+          <th>Add Date: </th>
+        </tr>
+        ${dataElements}
+      </tbody>
+    </table>`;
+  $id('root').innerHTML = '';
+  $id('root').innerHTML += dataTable;
 }
 
+const data = {
+  todos: [{
+    id: 1,
+    todoThing: 'aaaa',
+    isComplete: false, 
+  }]
+};
+function toggleTodo(e) {
+  const todoID = parseInt(e.target.getAttribute('todoID'));
+  let todos = data.todos;
+  todos.map(todo => 
+    todo.id === todoID ? 
+    { ...todo, isComplete: !todo.isComplete} : 
+    todo
+  );
+
+}
+function deleteTodo(e) {
+  const todoID = parseInt(e.target.getAttribute('todoID'));
+  let todos = data.todos;
+  let newTodos = [];
+  todos.forEach(todo => {
+    if(todo.id !== todoID) {
+      newTodos = [...newTodos, todo];
+    }
+  });
+  console.log(newTodos);
+}
+function addTodos(e) {
+  if($id('inputTodo').value === '') {
+    alert('Please todo something!');
+    return;
+  }
+  let todos = data.todos;
+  let newTodo = {
+    id: typeof(todos[todos.length - 1]) !== 'undefined' ? 
+    (todos[todos.length - 1].id) + 1 : 
+    1,
+    todoThing: $id('inputTodo').value,
+    isComplete: false,
+  }
+  data.todos = [...todos, newTodo];
+  $id('inputTodo').value = '';
+  // 更新資料庫
+  //rerender
+  addMyRequest('Todos', mountTodos, data.todos);
+}
+function mountTodos(todosArr) {
+  console.log(todosArr);
+  data.todos = todosArr; //update inner data!
+  let todos = '';
+  for (let i = 0; i < todosArr.length; i++) {
+    const todo = todosArr[i];
+    todos +=  
+      `<p>
+        <span>${todo.id} </span>
+        ${todo.todoThing} 
+        <span class='deleteBTN' todoID=${todo.id}> | X | </span>
+      </p>`;
+  }
+  $id('todo-container').innerHTML = '';
+  $id('todo-container').innerHTML += todos;
+  for (const el of $('.deleteBTN')) {
+    el.onclick = deleteTodo;
+  }
+  // add event listener to the all todos
+}
+
+
+
+$id('BTN1').addEventListener('click', function() {
+  // document.writeln(addMyRequest());
+});
+
+$id('BTN2').addEventListener('click', function() {
+  addMyRequest('Member', mountDataTable, [data1, data2]);
+});
+
+window.addEventListener('load', function () {
+  // Member Table
+  addMyRequest('Member', mountDataTable);
+  // Todos
+  addMyRequest('Todos', mountTodos);
+  $id('todoConfirm').onclick = function(e) {
+    //直接更新畫面，再存入資料庫
+    addTodos();
+  }
+  $id('inputTodo').onkeyup = function (e) {
+    if(e.keyCode === 13 || e.keyCode === 27) {
+      addTodos();
+    }
+  }
+});
+
+
+//---------------------------------------------------------------------------------------
+
+
+// function updateRequests() {
+//   console.log(db);
+//   for (let i = 0; i < data.length; i++) {
+//     const el = data[i];
+//     console.log(el.id);
+//     if(typeof(el.id) === 'number') {
+//       console.log('add it');
+//       add(db, el);
+//     }
+//   }
+// }
+
+
 // add();
+
+// return objectStore;
+  // objectStore.openCursor().onsuccess = function(e) {
+  //   let cursor = e.target.result;
+  //   if(cursor) {
+  //     let obj = {
+  //       id: cursor.key,
+  //       name: cursor.value.name,
+  //       date: cursor.value.date,
+  //     }
+  //     dbObjects = [...dbObjects, obj];
+  //     cursor.continue();
+  //   } else {
+  //     console.log('read complete');
+  //     // console.log(dbObjects);
+  //     return dbObjects;
+  //   }
+  // };
+  // function read(db) {
+  //   console.log('reading start!');
+  //   let request = db.transaction(['Member']).objectStore('Member').get(1); //temp id: 1
+  
+  //   request.onerror = function(e) {
+  //     console.log('read failed, need to add');
+      
+  //   }
+  //   request.onsuccess = function(e) {
+  //     console.log(request.result);
+  //     if(request.result) {
+  //       let rs = request.result;
+  //     } else {
+  //       console.log('add');
+  //     }
+  //   }
+  //   return db;
+  // }

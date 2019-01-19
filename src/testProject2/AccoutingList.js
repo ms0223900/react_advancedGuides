@@ -15,20 +15,22 @@ function AccountingList(props) {
         onChange={(e) => props.onChangeNumber(e, id)}
         onKeyDown={(e) => props.onKeyDown(e, id)}
         ref={props.inputRef} />;
+
     return (
       <React.Fragment>
         {props.accountingList.map(ls => (
           <tr key={ls.id}>
             <td>{ls.category}</td>
+
             <td 
               onDoubleClick={() => props.onHandleEdit(ls.id)}
-              id={'price' + ls.id}
-            >
+              id={'price' + ls.id} >
               {ls.isEdit ? 
                 editInput(ls.price, ls.id) : 
                 ('$  ' + ls.price)
               }
             </td>
+
             <td 
               onClick={() => props.onHandleEdit(ls.id)}>
               <img 
@@ -36,6 +38,7 @@ function AccountingList(props) {
                 alt="edit" 
                 title="edit price"/>
             </td>
+
           </tr>
         ))}
       </React.Fragment>

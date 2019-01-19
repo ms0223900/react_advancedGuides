@@ -96,6 +96,11 @@ describe('test InputPad.js', () => {
 //---------------------------------------------------------------------------------------
 
 describe('test App3', () => {
+  it('today title will be  match date format: yyyy-mm-dd', () => {
+    const app3 = shallow(<App3 />);
+    const date_regExp = new RegExp(/([12]\d{3})[-](0[1-9]|1[0-2]|\d)[-](0[1-9]|[12]\d|3[01])/);
+    expect(app3.find('#today-title').text()).toMatch(date_regExp);
+  });
   it('test "clear" function and set the number of state to zero.', () => {
     const app3 = shallow(<App3 />);
     app3.instance()._onHandleClear();
