@@ -42,8 +42,53 @@ dataBaseInit('Member');
 dataBaseInit('Todos');  
 
 //---------------------------------------------------------------------------------------
-
-
+function update(db, table, dataArr) {
+  console.log('updating start!');
+  //取得第0個
+  if(dataArr) {
+    for (let i = 0; i < dataArr.length; i++) {
+      console.log(dataArr[i]);
+      let request = db.transaction([table], 'readwrite')
+        .objectStore(table)
+        .put(dataArr[i]);
+      console.log(request);
+      request.addEventListener('success', (e) => {
+        console.log("update success !");
+      });
+      request.addEventListener('error', (e) => {
+        console.log('already have the dataArr.');
+      });
+      if(i === dataArr.length - 1) {
+        return [db, table];
+      }
+    }
+  } else {
+    return [db, table];
+  }
+}
+function deleteIt(db, table, idArr) {
+  console.log('deleting start!');
+  //取得第0個
+  if(idArr) {
+    for (let i = 0; i < idArr.length; i++) {
+      console.log(idArr[i]);
+      let request = db.transaction([table], 'readwrite')
+        .objectStore(table)
+        .delete(idArr[i]);
+      request.addEventListener('success', (e) => {
+        console.log("update success !");
+      });
+      request.addEventListener('error', (e) => {
+        console.log('already have the idArr.');
+      });
+      if(i === idArr.length - 1) {
+        return [db, table];
+      }
+    }
+  } else {
+    return [db, table];
+  }
+}
 function add(db, table,  dataArr) {
   console.log('adding start!');
   //取得第0個
@@ -108,7 +153,6 @@ function addMyRequest(table, mountEl, dataArr = []) {
       .then(val => getDB_All(val[0], val[1]))
       .then(val => mountEl(val));
     }
-    
   }
 }
 function mountDataTable(el) {
@@ -148,33 +192,73 @@ const data = {
     isComplete: false, 
   }]
 };
-function updateTodo(e) {
-  
+
+function removeRequst(table,mountEl, idArr) {
+  let db;
+  let dbPromise;
+  let request = window.indexedDB.open('myDB1');
+  request.onsuccess = function(e) {
+    console.log('openSuccess!');
+    dbPromise = new Promise((res, rej) => {
+      db = e.target.result; //這裡要用異步處理！！
+      res([db, table, idArr]);
+    });
+    dbPromise
+      .then(val => deleteIt(val[0], val[1], val[2]))
+      .then(val => getDB_All(val[0], val[1]))
+      .then(val => mountEl(val));;
+  }
+}
+
+function updateRequst(table,mountEl, dataArr) {
+  let db;
+  let dbPromise;
+  let request = window.indexedDB.open('myDB1');
+  request.onsuccess = function(e) {
+    console.log('openSuccess!');
+    dbPromise = new Promise((res, rej) => {
+      db = e.target.result; //這裡要用異步處理！！
+      res([db, table, dataArr]);
+    });
+    dbPromise
+      .then(val => update(val[0], val[1], val[2]))
+      .then(val => getDB_All(val[0], val[1]))
+      .then(val => mountEl(val));;
+  }
+}
+function filterTodo() {
+  let todos = data.todos;
+  for (let i = 0; i < todos.length; i++) {
+    const el = todos[i];
+    if(el.isComplete === true && !$('.todoItemLine')[i].classList.contains('invisible')) {
+      $('.todoItemLine')[i].classList.add('invisible');
+    } else if($('.todoItemLine')[i].classList.contains('invisible')) {
+      $('.todoItemLine')[i].classList.remove('invisible');
+    }
+  }
 }
 function toggleTodo(id, e) {
   let todos = data.todos;
   let newTodos = 
-  todos.map(todo => 
-    todo.id === id ? 
-    { ...todo, isComplete: !todo.isComplete } : 
-    todo
-  );
-  data.todos = newTodos;
-  
-  console.log(data.todos);
-  // console.log(e.target.className);
-  addMyRequest('Todos', mountTodos, data.todos);
+  todos.filter(todo => todo.id === id);
+  newTodos = [{...newTodos[0] , isComplete: !newTodos[0].isComplete, }];
+  updateRequst('Todos', mountTodos, newTodos);
 }
-function deleteTodo(e) {
+function deleteTodo(e) { 
   const todoID = parseInt(e.target.getAttribute('todoID'));
-  let todos = data.todos;
-  let newTodos = [];
-  todos.forEach(todo => {
-    if(todo.id !== todoID) {
-      newTodos = [...newTodos, todo];
-    }
-  });
-  console.log(newTodos);
+  console.log(todoID);
+  let idArr = [];
+  idArr = [...idArr, todoID];
+  console.log(idArr);
+  // let todos = data.todos;
+  // let newTodos = [];
+  // todos.forEach(todo => {
+  //   if(todo.id !== todoID) {
+  //     newTodos = [...newTodos, todo];
+  //   }
+  // });
+  // console.log(newTodos);
+  removeRequst('Todos', mountTodos, idArr);
 }
 function addTodos(e) {
   if($id('inputTodo').value === '') {
@@ -202,27 +286,37 @@ function mountTodos(todosArr) {
   for (let i = 0; i < todosArr.length; i++) {
     const todo = todosArr[i];
     console.log(todo.isComplete);
-    let className;
+    let style;
+    let onClickEvent = `toggleTodo.bind(this,${(i + 1).toString()})`;
     if(todo.isComplete) {
-      className = 'todoItem line';
+      style = 'text-decoration:line-through';
     } else {
-      className = 'todoItem';
+      style = '';
     }
+    // onClick=${onClickEvent}
     todos +=  
-      `<p>
+      `<p class="todoItemLine">
         <span>${todo.id} </span>
-        <span class=${className}>${todo.todoThing}<span> 
+        <span class=todoItem todoid=${todo.id} style=${style} >${todo.todoThing}</span> 
         <span class='deleteBTN' todoID=${todo.id}> | X | </span>
       </p>`;
   }
   $id('todo-container').innerHTML = '';
   $id('todo-container').innerHTML += todos;
   for (const el of $('.deleteBTN')) {
-    el.onclick = deleteTodo;
+    el.onclick = function(e) {
+      let result = window.confirm("Are you sure to delete this todo?");
+      if (result) {
+        deleteTodo(e);
+      } else {
+        return;
+      }
+    }
   }
   const todoItem = $('.todoItem');
   for (let i = 0; i < todoItem.length; i++) {
-    todoItem[i].onclick = toggleTodo.bind(this, i + 1);
+    const todoID = parseInt(todoItem[i].getAttribute('todoid')); //必須轉成數字形式
+    todoItem[i].onclick = toggleTodo.bind(this, todoID);
   }
   // add event listener to the all todos
 }
@@ -250,6 +344,9 @@ window.addEventListener('load', function () {
     if(e.keyCode === 13 || e.keyCode === 27) {
       addTodos();
     }
+  }
+  $id('filterTodo').onclick = function(e) {
+    filterTodo();
   }
 });
 

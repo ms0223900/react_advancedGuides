@@ -9,8 +9,11 @@
     .deleteBTN {
       cursor: pointer;
     }
-    .todoItem.line {
+    .todoItem-line {
       text-decoration: line-through;
+    }
+    .todoItemLine.invisible {
+      display: none;
     }
   </style>
 </head>
@@ -23,6 +26,7 @@
   <div id="root2">
     <input type="text" placeholder="What to do? " id="inputTodo">  
     <button id="todoConfirm"> + </button>
+    <button id="filterTodo">filterTodo</button>
   </div>
   <div id="todo-container">
 
