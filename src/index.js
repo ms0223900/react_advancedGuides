@@ -7,6 +7,7 @@ import App4 from './React_flux_redux/App4';
 import './testProject/css/App2.css';
 import './testProject2/css/App3.css';
 import './React_flux_redux/App4.css';
+import store from './React_flux_redux/reducers/index'
 import * as serviceWorker from './serviceWorker';
 
 const $id = (id) => document.getElementById(id);

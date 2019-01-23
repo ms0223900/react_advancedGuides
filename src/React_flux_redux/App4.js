@@ -75,7 +75,7 @@ class TodoApp extends React.Component {
       title: this.state.title,
       todoCount: todoCount,
     }
-    console.log(this.state.todoLists.filter(todo => !todo.iscompleted).length);
+
     return (
       <div>
         <h2>TodoList!</h2>
@@ -92,6 +92,13 @@ class TodoApp extends React.Component {
     );
   }
 };
+
+// store.dispatch({ type: 'INCREMENT', });
+// store.dispatch({ type: 'INCREMENT', });
+
+// store.dispatch({ type: 'DECREMENT', });
+
+
 
 export default TodoApp;
 // 
