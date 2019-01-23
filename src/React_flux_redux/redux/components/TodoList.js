@@ -8,7 +8,7 @@ const TodoList = ({ todos, onTodoClick }) => (
       <Todo 
       key={index} 
       {...todo}
-      onClick={() => onTodoClick} /> 
+      onClick={() => onTodoClick(index)} /> 
     ))}
   </ul>
 );

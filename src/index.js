@@ -7,7 +7,8 @@ import App4 from './React_flux_redux/App4';
 import './testProject/css/App2.css';
 import './testProject2/css/App3.css';
 import './React_flux_redux/App4.css';
-import store from './React_flux_redux/reducers/index'
+import App5 from './React_flux_redux/redux/index';
+import store from './React_flux_redux/redux2/index';
 import * as serviceWorker from './serviceWorker';
 
 const $id = (id) => document.getElementById(id);
@@ -33,6 +34,7 @@ $id('root-button').addEventListener('click', function () {
 // ReactDOM.render(<App2 />, document.getElementById('root2'));
 // ReactDOM.render(<App3 />, document.getElementById('root3'));
 ReactDOM.render(<App4 />, document.getElementById('root4'));
+ReactDOM.render(<App5 />, document.getElementById('root5'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
