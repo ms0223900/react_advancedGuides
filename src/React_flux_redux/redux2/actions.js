@@ -52,7 +52,7 @@ function fetchPosts(subreddit) {
       );
   }
 }
-
+//HOC
 export function fetchPostsIfNeeded(subreddit) {
   return (dispatch, getState) => {
     if(shouldFetchPosts(getState(), subreddit)) {
