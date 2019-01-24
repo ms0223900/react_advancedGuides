@@ -3,13 +3,12 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { createStore } from "redux";
 import todoApp from './reducer';
-import App from './components/App';
+import Root from './components/Root';
 
 const store = createStore(todoApp);
+
 const App5 = () => (
-  <Provider store={store}>
-    <App />
-  </Provider>
+  <Root store={store} />
 )
 
 export default App5;

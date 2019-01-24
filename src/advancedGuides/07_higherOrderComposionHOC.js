@@ -17,18 +17,18 @@ import ReactDOM from 'react-dom';
 // )
 
 //HOC render(): 通常會是
-render() {
+function render() {
   //將額外的props分開，然後不要將他傳值過來
   const { extraProp, ...passThroughProps } = this.props;
   //插入的props給這個component 會是state, method之類的
-  const injectedProps = someStateInstanceMethod;
+  const injectedProps = 'someStateInstanceMethod';
 
   // 將值傳遞給組件，插入的值和傳遞下來的值
-  return (
-    <WrappedComponent
-      injectedProp={injectedProp}
-      {...passThroughProps} />
-  );
+  return 
+    // <WrappedComponent
+    //   injectedProp={injectedProp}
+    //   {...passThroughProps} />
+  ;
 }
 
 
