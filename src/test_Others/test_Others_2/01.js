@@ -1,6 +1,11 @@
 const $id = (id) => document.getElementById(id);
 const $ = (all) => document.querySelectorAll(all);
 let windowWH;
+const canvas = $id('myCanvas');
+const ctx = canvas.getContext('2d');
+
+ctx.fillRect(0, 0, 100, 100);
+
 const gravity = (3528 / 20000);
 const recArea = {
   left: 0,
