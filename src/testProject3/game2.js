@@ -1,5 +1,7 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable no-unused-vars */
+
+//tetris
 const $id = (id) => document.getElementById(id)
 function rotateTetris(t, centerT, deg) {
 
