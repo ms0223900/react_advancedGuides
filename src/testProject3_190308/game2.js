@@ -29,6 +29,8 @@ function rotateTetris(t, centerT, deg) {
 }
 
 const ctx = document.getElementById("root").getContext("2d")
+const ctx2 = document.getElementById("holdArea").getContext("2d")
+
 
 const tetrisStyles = [
   [-9, 1, 2, 3],
@@ -62,11 +64,24 @@ let tetrisBlockAll = {
   pos: [],
   color: [],
 }
+let holdingBlock = {
+  pos: [],
+  color: [],
+  center: []
+}
 let countForTimer = 0
+let dropImm = false
+let hold = false
+let isHolding = false
 
 function draw(n, color) {
-	ctx.fillStyle = color;
-	ctx.fillRect(n % 10 * 20 + 1, ~~(n / 10) * 20 + 1,  18, 18);
+	ctx.fillStyle = color
+	ctx.fillRect(n % 10 * 20 + 1, ~~(n / 10) * 20 + 1,  18, 18)
+}
+
+function drawHoldArea(n, color) {
+  ctx2.fillStyle = color
+	ctx2.fillRect(n % 10 * 20 + 1, ~~(n / 10) * 20 + 1,  18, 18)
 }
 
 function clearWholeLine(arr, ...needClearArr) {
@@ -123,25 +138,58 @@ function game() {
     countForTimer = countForTimer + 1
     // check if a line is fulfilled
     ctx.clearRect(0, 0, 200, 400)
+    ctx2.clearRect(0, 0, 200, 400)
     let clearBlockAll = clearWholeLine(tetrisLine, tetrisBlockAll.pos, tetrisBlockAll.color)
     tetrisBlockAll = {
       pos: clearBlockAll[0],
       color: clearBlockAll[1],
     }
-    
-    
-    
-
 
     //random tetris block
-    if(tetrisNow.pos.length === 0) {
-      const randomNum = ~~(Math.random() * tetrisStyles.length)
-      tetrisNow = {
-        pos: tetrisStyles[randomNum],
-        color: colors[~~(Math.random() * colors.length)],
-        center: tetrisCenter[randomNum], //temp center
+    const genNewRandomTetris = () => {
+      if(tetrisNow.pos.length === 0) {
+        const randomNum = ~~(Math.random() * tetrisStyles.length)
+        tetrisNow = {
+          pos: tetrisStyles[randomNum],
+          color: colors[~~(Math.random() * colors.length)],
+          center: tetrisCenter[randomNum], //temp center
+        }
       }
     }
+    genNewRandomTetris()
+
+
+    if(!isHolding && hold) {
+      if(hold) {
+        if(holdingBlock.pos.length === 0) {
+          const { pos, color, center } = tetrisNow
+          holdingBlock = {
+            pos: pos,
+            color: color,
+            center: center,
+          }
+          hold = false
+          isHolding = true
+          tetrisNow.pos = []
+        } else {
+          const { pos, color, center } = holdingBlock
+          holdingBlock = {
+            pos: tetrisNow.pos,
+            color: tetrisNow.color,
+            center: tetrisNow.center,
+          }
+          tetrisNow = {
+            pos: pos,
+            color: color,
+            center: center,
+          }
+          
+          hold = false
+          isHolding = true
+        } 
+      }
+    }
+    
       
     // tetris rotate
     console.log(rotation)
@@ -192,39 +240,58 @@ function game() {
       }
     }
     //new position, continously down
-    if(direction >= 1000) {
-      tetrisNow = countForTimer % 1 === 0 ? {
+    const tetrisDown = () => {
+      tetrisNow = {
         pos: [...tetrisNow.pos.map(t => t + 10 )],
         color: tetrisNow.color,
         center: tetrisNow.center + 10
-      } : tetrisNow
-    } else {
-      tetrisNow = countForTimer % 5 === 0 ? {
-        pos: [...tetrisNow.pos.map(t => t + 10 )],
-        color: tetrisNow.color,
-        center: tetrisNow.center + 10
-      } : tetrisNow
-    }
-    
-  
-  
-    //collide the bottom
-    let newColor = tetrisNow.pos.map(i => tetrisNow.color)
-    for(let i of tetrisNow.pos) {
-      if(
-          (i >= 10 * 19 && i < 10 * 20) | 
-          tetrisBlockAll.pos.indexOf(i + 10) >= 0)  {
-        tetrisBlockAll = {
-          pos: [...tetrisBlockAll.pos, ...tetrisNow.pos],
-          color: [...tetrisBlockAll.color, ...newColor],
-        }
-        // console.log('updateBlockAll')
-        tetrisNow = { pos: [], color: '', }
-        break
       }
     }
+    if(direction >= 1000) {
+      if(countForTimer % 1 === 0) {
+        tetrisDown()
+      }
+    } else {
+      if(countForTimer % 5 === 0) {
+        tetrisDown()
+      }
+    }
+    
+    //immediately drop down
+    if(dropImm) {
+      while(checkBottom() !== false) {
+        tetrisDown()
+      }
+    }
+    dropImm = false
+  
+    //collide the bottom
+    
+    function checkBottom() {
+      let newColor = tetrisNow.pos.map(i => tetrisNow.color)
+      for(let i of tetrisNow.pos) {
+        if(
+            (i >= 10 * 19 && i < 10 * 20) | 
+            tetrisBlockAll.pos.indexOf(i + 10) >= 0)  {
+          tetrisBlockAll = {
+            pos: [...tetrisBlockAll.pos, ...tetrisNow.pos],
+            color: [...tetrisBlockAll.color, ...newColor],
+          }
+          // console.log('updateBlockAll')
+          tetrisNow = { pos: [], color: '', }
+          isHolding = false
+          return false
+        }
+      }
+    }
+    checkBottom()
+
+
     for(let i of tetrisNow.pos) {
       draw(i, tetrisNow.color)
+    }
+    for(let i of holdingBlock.pos) {
+      drawHoldArea(i, holdingBlock.color)
     }
     for(let i = 0;i < tetrisBlockAll.pos.length; i++) {
       draw(tetrisBlockAll.pos[i], tetrisBlockAll.color[i])
@@ -245,12 +312,19 @@ document.addEventListener('keyup', function(e) {
   direction = [0, 0, 0, 0][e.keyCode - 37] | 0
   // rotation = [-PI, 0, 0, PI / 2][e.keyCode - 65] | 0
   // console.log(rotation)
+  console.log(e.keyCode)
   if(e.keyCode === 65) {
     rotation = -deg90
   } else if(e.keyCode === 68) {
     rotation = deg90
   } else {
     rotation = 0
+  }
+  if(e.keyCode === 32) {
+    dropImm = true
+  }
+  if(e.keyCode === 83) {
+    hold = isHolding === false ? true : false
   }
   dropTime = e.keyCode === 40 ? 50 : 100
 })
@@ -259,4 +333,3 @@ document.addEventListener('keydown', function(e) {
   // dropTime = e.keyCode === 40 ? 50 : 100 
   direction = [-1, 100, 1, 1000][e.keyCode - 37] | direction
 })
-
