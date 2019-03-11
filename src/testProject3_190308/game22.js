@@ -79,7 +79,7 @@ const getNextPos = (dir, posNow) => {
 
 
 // const MAP = [0, 1, 2, 3, 4, 5, 9, 12, 15, 19, 20, 21, 22, 23, 24]
-const MAP = [0, 1, 2, 3, 4, 5, 6, 11, 14, 16, 17, 20, 23, 24, 26, 27, 28, 30, 36, 37, 38, 39, 40, 41]
+const MAP = [0, 1, 2, 3, 4, 5, 6, 11, 14, 16, 17, 20, 23, 24, 26, 27, 28, 30, 35, 36, 37, 38, 39, 40, 41]
 const generateDots = () => {
   let arr = []
   const dotsAmount = canvas.wBlocks * canvas.hBlocks
@@ -96,7 +96,9 @@ let DOTS = generateDots()
 
 let posInit = false
 let pacPosNow = [20, 20]
+let pacEnemy = [20, 100]
 let direction = 'right'
+let pacDir = 'right'
 
 
 function drawAll(blocks, color) {
@@ -116,10 +118,17 @@ function game() {
    drawAll(MAP)
    drawAll(DOTS, '#aaa')
    drawPac(pacPosNow, '#ff0')
+   drawPac(pacEnemy, '#f70')
    
   //  console.log(checkAllCollide(pacPosNow, MAP))
   pacPosNow = !checkAllCollide(getNextPos(direction, pacPosNow), MAP) ? getNextPos(direction, pacPosNow) : pacPosNow
   DOTS = checkAllCollide(pacPosNow, DOTS) ? DOTS.filter(dot => !checkCollide(pacPosNow, dot)) : DOTS
+
+  if(checkAllCollide(getNextPos(pacDir, pacEnemy), MAP)) {
+    pacDir = ['left', 'up', 'right', 'down'][~~(Math.random() * 4)]
+  }
+  console.log(pacDir)
+  pacEnemy = !checkAllCollide(getNextPos(pacDir, pacEnemy), MAP) ? getNextPos(pacDir, pacEnemy) : pacEnemy
   
   //  console.log(pacPosNow)
    // pacPosNow = checkCollide(pacPosNow + 1, MAP) ? pacPosNow : pacPosNow + 1
