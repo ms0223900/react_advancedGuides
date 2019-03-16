@@ -50,7 +50,7 @@ class rotateEL {
   startRotate(posX, posY) {
     this.isClick = true
     this.a1 = getAngleFrom0(posX, posY,  this.centerPos)
-    this.originAngle = this.el.style.transform.match(/\d|\./gi).join('') * 1
+    this.originAngle = this.el.style.transform.match(/-|\d|\./gi).join('') * 1 % 360
   }
   init() {
     this.getCenter()
